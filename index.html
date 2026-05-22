@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VolunteerHub — Sign In</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    body { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 24px; }
+
+    .auth-wrap {
+      width: 100%; max-width: 420px;
+      position: relative; z-index: 1;
+      animation: fadeInUp 0.5s cubic-bezier(0.4,0,0.2,1) both;
+    }
+
+    .auth-brand {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .auth-brand-name {
+      font-family: var(--font-display);
+      font-size: 2.4rem;
+      color: var(--text);
+      letter-spacing: -0.02em;
+      display: block;
+    }
+    .auth-brand-sub {
+      font-size: 13px;
+      color: var(--text-3);
+      margin-top: 4px;
+    }
+
+    .auth-card {
+      background: var(--glass);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      padding: 36px 32px;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .auth-tabs {
+      display: flex;
+      gap: 0;
+      margin-bottom: 28px;
+      background: var(--surface);
+      border-radius: var(--radius-sm);
+      padding: 3px;
+    }
+    .auth-tab {
+      flex: 1;
+      padding: 9px;
+      border: none;
+      background: none;
+      color: var(--text-2);
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: all var(--transition);
+    }
+    .auth-tab.active {
+      background: var(--bg-2);
+      color: var(--text);
+      box-shadow: var(--shadow);
+    }
+
+    .auth-form { display: flex; flex-direction: column; gap: 16px; }
+    .auth-form-panel { display: none; }
+    .auth-form-panel.active { display: flex; flex-direction: column; gap: 16px; }
+
+    .google-btn {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      padding: 11px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all var(--transition);
+      width: 100%;
+    }
+    .google-btn:hover { background: var(--surface-hover); border-color: var(--border-hover); }
+    .google-icon {
+      width: 18px; height: 18px;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><path fill="%23EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="%234285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="%23FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="%2334A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.36-8.16 2.36-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>') center/contain no-repeat;
+      flex-shrink: 0;
+    }
+
+    .pending-message {
+      display: none;
+      text-align: center;
+      padding: 28px 20px;
+    }
+    .pending-icon { font-size: 2.5rem; margin-bottom: 12px; }
+    .pending-message h3 { font-family: var(--font-display); font-size: 1.4rem; margin-bottom: 8px; }
+    .pending-message p { font-size: 13px; color: var(--text-2); line-height: 1.6; }
+
+    .forgot-link { font-size: 12px; color: var(--text-3); cursor: pointer; transition: color var(--transition); text-align: right; }
+    .forgot-link:hover { color: var(--accent); }
+
+    .theme-toggle-auth {
+      position: fixed; top: 20px; right: 20px; z-index: 10;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 50%; width: 40px; height: 40px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 16px; transition: all var(--transition);
+    }
+    .theme-toggle-auth:hover { background: var(--surface-hover); }
+
+    .global-error {
+      background: var(--danger-bg);
+      border: 1px solid rgba(248,113,113,0.2);
+      border-radius: var(--radius-sm);
+      padding: 12px 14px;
+      font-size: 13px;
+      color: var(--danger);
+      display: none;
+    }
+    .global-error.visible { display: block; }
+  </style>
+</head>
+<body>
+  <div class="bg-atmosphere"></div>
+
+  <!-- Theme Toggle -->
+  <button class="theme-toggle-auth theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+    <span class="theme-icon">☀️</span>
+  </button>
+
+  <div class="auth-wrap">
+    <!-- Brand -->
+    <div class="auth-brand">
+      <span class="auth-brand-name">VolunteerHub</span>
+      <p class="auth-brand-sub">Managing impact, together.</p>
+    </div>
+
+    <!-- Card -->
+    <div class="auth-card">
+      <!-- Tabs -->
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tab-signin" onclick="switchTab('signin')">Sign In</button>
+        <button class="auth-tab" id="tab-signup" onclick="switchTab('signup')">Sign Up</button>
+      </div>
+
+      <!-- Global error -->
+      <div class="global-error" id="global-error"></div>
+
+      <!-- Sign In -->
+      <div class="auth-form-panel active" id="panel-signin">
+        <button class="google-btn" onclick="handleGoogleSignIn()">
+          <span class="google-icon"></span>
+          Continue with Google
+        </button>
+        <div class="divider-text">or</div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" id="signin-email" class="form-input" placeholder="you@example.com" />
+          <span class="form-error" id="err-signin-email"></span>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input type="password" id="signin-password" class="form-input" placeholder="••••••••" />
+          <span class="form-error" id="err-signin-password"></span>
+        </div>
+        <span class="forgot-link" onclick="handleForgotPassword()">Forgot password?</span>
+        <button class="btn btn-primary btn-full" id="signin-btn" onclick="handleSignIn()">Sign In</button>
+      </div>
+
+      <!-- Sign Up -->
+      <div class="auth-form-panel" id="panel-signup">
+        <button class="google-btn" onclick="handleGoogleSignIn()">
+          <span class="google-icon"></span>
+          Continue with Google
+        </button>
+        <div class="divider-text">or</div>
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input type="text" id="signup-name" class="form-input" placeholder="Jane Doe" />
+          <span class="form-error" id="err-signup-name"></span>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" id="signup-email" class="form-input" placeholder="you@example.com" />
+          <span class="form-error" id="err-signup-email"></span>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input type="password" id="signup-password" class="form-input" placeholder="Min. 8 characters" />
+          <span class="form-error" id="err-signup-password"></span>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Confirm Password</label>
+          <input type="password" id="signup-confirm" class="form-input" placeholder="Repeat password" />
+          <span class="form-error" id="err-signup-confirm"></span>
+        </div>
+        <button class="btn btn-primary btn-full" id="signup-btn" onclick="handleSignUp()">Create Account</button>
+      </div>
+
+      <!-- Pending State (shown after sign up) -->
+      <div class="pending-message" id="pending-message">
+        <div class="pending-icon">⏳</div>
+        <h3>Application Submitted</h3>
+        <p>Your account has been created and is pending review. We'll email you once a decision has been made.</p>
+        <button class="btn btn-ghost btn-full" style="margin-top:20px;" onclick="switchTab('signin')">Back to Sign In</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="js/emailjs.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    // Init EmailJS
+    initEmailJS();
+
+    // Redirect if already logged in
+    handleAuthRedirect();
+
+    // ── Tab Switching ────────────────────────
+    function switchTab(tab) {
+      document.getElementById('panel-signin').classList.toggle('active', tab === 'signin');
+      document.getElementById('panel-signup').classList.toggle('active', tab === 'signup');
+      document.getElementById('pending-message').style.display = 'none';
+      document.getElementById('tab-signin').classList.toggle('active', tab === 'signin');
+      document.getElementById('tab-signup').classList.toggle('active', tab === 'signup');
+      clearErrors();
+    }
+
+    // ── Validation ───────────────────────────
+    function showError(id, msg) {
+      const el = document.getElementById(id);
+      if (el) { el.textContent = msg; el.classList.add('visible'); }
+      const input = document.getElementById(id.replace('err-', '').replace('-', '-'));
+      if (input) input.classList.add('error');
+    }
+    function clearErrors() {
+      document.querySelectorAll('.form-error').forEach(e => { e.textContent = ''; e.classList.remove('visible'); });
+      document.querySelectorAll('.form-input').forEach(e => e.classList.remove('error'));
+      const ge = document.getElementById('global-error');
+      ge.textContent = ''; ge.classList.remove('visible');
+    }
+    function showGlobalError(msg) {
+      const el = document.getElementById('global-error');
+      el.textContent = msg; el.classList.add('visible');
+    }
+
+    // ── Toast ────────────────────────────────
+    function showToast(msg, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      toast.textContent = msg;
+      container.appendChild(toast);
+      setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateX(30px)'; toast.style.transition = '0.3s'; setTimeout(() => toast.remove(), 300); }, 3500);
+    }
+
+    // ── Sign In ──────────────────────────────
+    async function handleSignIn() {
+      clearErrors();
+      const email = document.getElementById('signin-email').value.trim();
+      const password = document.getElementById('signin-password').value;
+      let valid = true;
+      if (!email) { showError('err-signin-email', 'Email is required'); valid = false; }
+      if (!password) { showError('err-signin-password', 'Password is required'); valid = false; }
+      if (!valid) return;
+
+      const btn = document.getElementById('signin-btn');
+      btn.textContent = 'Signing in...'; btn.disabled = true;
+      try {
+        await signIn(email, password);
+        const user = await getCurrentUser();
+        if (user) redirectToDashboard(user.role);
+      } catch (err) {
+        showGlobalError(err.message || 'Sign in failed. Please try again.');
+      } finally {
+        btn.textContent = 'Sign In'; btn.disabled = false;
+      }
+    }
+
+    // ── Sign Up ──────────────────────────────
+    async function handleSignUp() {
+      clearErrors();
+      const name = document.getElementById('signup-name').value.trim();
+      const email = document.getElementById('signup-email').value.trim();
+      const password = document.getElementById('signup-password').value;
+      const confirm = document.getElementById('signup-confirm').value;
+      let valid = true;
+      if (!name) { showError('err-signup-name', 'Full name is required'); valid = false; }
+      if (!email) { showError('err-signup-email', 'Email is required'); valid = false; }
+      if (!password || password.length < 8) { showError('err-signup-password', 'Minimum 8 characters'); valid = false; }
+      if (password !== confirm) { showError('err-signup-confirm', 'Passwords do not match'); valid = false; }
+      if (!valid) return;
+
+      const btn = document.getElementById('signup-btn');
+      btn.textContent = 'Creating account...'; btn.disabled = true;
+      try {
+        await signUp(email, password, name);
+        await sendWelcomeEmail(name, email);
+        // Hide forms, show pending
+        document.getElementById('panel-signup').classList.remove('active');
+        document.getElementById('pending-message').style.display = 'block';
+        document.getElementById('tab-signup').classList.remove('active');
+        document.getElementById('tab-signin').classList.add('active');
+      } catch (err) {
+        showGlobalError(err.message || 'Sign up failed. Please try again.');
+      } finally {
+        btn.textContent = 'Create Account'; btn.disabled = false;
+      }
+    }
+
+    // ── Google Sign In ───────────────────────
+    async function handleGoogleSignIn() {
+      try {
+        await signInWithGoogle();
+      } catch (err) {
+        showGlobalError(err.message || 'Google sign in failed.');
+      }
+    }
+
+    // ── Forgot Password ──────────────────────
+    async function handleForgotPassword() {
+      const email = document.getElementById('signin-email').value.trim();
+      if (!email) { showError('err-signin-email', 'Enter your email first'); return; }
+      try {
+        await resetPassword(email);
+        showToast('Password reset email sent!', 'success');
+      } catch (err) {
+        showGlobalError(err.message || 'Could not send reset email.');
+      }
+    }
+
+    // Enter key support
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        if (document.getElementById('panel-signin').classList.contains('active')) handleSignIn();
+        else if (document.getElementById('panel-signup').classList.contains('active')) handleSignUp();
+      }
+    });
+  </script>
+</body>
+</html>

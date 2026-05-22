@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VolunteerHub — Admin</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/admin.css" />
+</head>
+<body>
+<div class="bg-atmosphere"></div>
+<div class="admin-layout">
+
+  <!-- Mobile Trigger -->
+  <button class="nav-mobile-trigger" id="nav-trigger" onclick="toggleNav()">☰</button>
+
+  <!-- Nav Overlay -->
+  <div class="nav-overlay" id="nav-overlay" onclick="toggleNav()"></div>
+
+  <!-- Sidebar Nav -->
+  <nav class="nav-sidebar" id="nav-sidebar">
+    <div class="nav-logo">
+      <div class="nav-logo-text">VolunteerHub</div>
+      <div class="nav-logo-sub">Admin Panel</div>
+    </div>
+    <div class="nav-user">
+      <div class="nav-avatar" id="nav-avatar">A</div>
+      <div class="nav-user-info">
+        <div class="nav-user-name" id="nav-name">Loading...</div>
+        <div class="nav-user-role">Administrator</div>
+      </div>
+    </div>
+    <div class="nav-links">
+      <button class="nav-link active" onclick="showSection('overview')"><span class="nav-link-icon">📊</span> Overview</button>
+      <button class="nav-link" onclick="showSection('volunteers')"><span class="nav-link-icon">👥</span> Volunteers <span class="nav-badge hidden" id="pending-badge">0</span></button>
+      <button class="nav-link" onclick="showSection('groups')"><span class="nav-link-icon">🗂️</span> Groups</button>
+      <button class="nav-link" onclick="showSection('tasks')"><span class="nav-link-icon">✅</span> Tasks</button>
+      <button class="nav-link" onclick="showSection('messages')"><span class="nav-link-icon">💬</span> Messages <span class="nav-badge hidden" id="msg-badge">0</span></button>
+      <button class="nav-link" onclick="showSection('notifications')"><span class="nav-link-icon">🔔</span> Notifications <span class="nav-badge hidden" id="notif-badge">0</span></button>
+    </div>
+    <div class="nav-bottom">
+      <button class="nav-link" onclick="showSection('settings')"><span class="nav-link-icon">⚙️</span> Settings</button>
+      <button class="nav-link" onclick="handleSignOut()"><span class="nav-link-icon">🚪</span> Sign Out</button>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="main-content">
+
+    <!-- ── OVERVIEW ── -->
+    <div id="section-overview">
+      <div class="page-header animate-in">
+        <h1 class="page-title">Overview</h1>
+        <p class="page-subtitle">Welcome back. Here's what's happening.</p>
+      </div>
+      <div class="content-area">
+        <div class="stats-grid animate-in delay-1" id="stats-grid">
+          <div class="stat-card"><div class="stat-label">Total Volunteers</div><div class="stat-value" id="stat-total">—</div></div>
+          <div class="stat-card"><div class="stat-label">Pending Review</div><div class="stat-value" id="stat-pending">—</div></div>
+          <div class="stat-card"><div class="stat-label">Active Groups</div><div class="stat-value" id="stat-groups">—</div></div>
+          <div class="stat-card"><div class="stat-label">Coordinators</div><div class="stat-value" id="stat-coordinators">—</div></div>
+        </div>
+
+        <div class="section animate-in delay-2">
+          <div class="section-header">
+            <h3 class="section-title">Recent Sign-Ups</h3>
+            <button class="btn btn-ghost btn-sm" onclick="showSection('volunteers')">View All</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Volunteer</th><th>Email</th><th>Status</th><th>Joined</th><th>Actions</th></tr></thead>
+              <tbody id="recent-volunteers-body">
+                <tr><td colspan="5"><div class="loading-center"><div class="spinner"></div></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── VOLUNTEERS ── -->
+    <div id="section-volunteers" class="hidden">
+      <div class="page-header animate-in">
+        <h1 class="page-title">Volunteers</h1>
+        <p class="page-subtitle">Manage applications and roles.</p>
+      </div>
+      <div class="content-area">
+        <div class="section-header" style="margin-bottom:16px;">
+          <div class="search-bar" style="flex:1;max-width:340px;">
+            <span class="search-icon">🔍</span>
+            <input type="text" placeholder="Search volunteers..." id="volunteer-search" oninput="filterVolunteers()" />
+          </div>
+          <div class="tabs" style="margin-bottom:0;">
+            <button class="tab active" onclick="filterByStatus('all', this)">All</button>
+            <button class="tab" onclick="filterByStatus('pending', this)">Pending</button>
+            <button class="tab" onclick="filterByStatus('approved', this)">Approved</button>
+            <button class="tab" onclick="filterByStatus('rejected', this)">Rejected</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Volunteer</th><th>Email</th><th>Role</th><th>Status</th><th>Joined</th><th>Actions</th></tr></thead>
+            <tbody id="volunteers-body">
+              <tr><td colspan="6"><div class="loading-center"><div class="spinner"></div></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── GROUPS ── -->
+    <div id="section-groups" class="hidden">
+      <div class="page-header animate-in">
+        <h1 class="page-title">Groups</h1>
+        <p class="page-subtitle">Organise volunteers into teams.</p>
+      </div>
+      <div class="content-area">
+        <div class="section-header">
+          <h3 class="section-title">All Groups</h3>
+          <button class="btn btn-primary btn-sm" onclick="openCreateGroupModal()">+ New Group</button>
+        </div>
+        <div class="group-grid" id="groups-grid">
+          <div class="loading-center"><div class="spinner"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── TASKS ── -->
+    <div id="section-tasks" class="hidden">
+      <div class="page-header animate-in">
+        <h1 class="page-title">Tasks</h1>
+        <p class="page-subtitle">Assign and track volunteer tasks.</p>
+      </div>
+      <div class="content-area">
+        <div class="section-header">
+          <h3 class="section-title">All Tasks</h3>
+          <button class="btn btn-primary btn-sm" onclick="openCreateTaskModal()">+ New Task</button>
+        </div>
+        <div class="task-list" id="tasks-list">
+          <div class="loading-center"><div class="spinner"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── MESSAGES ── -->
+    <div id="section-messages" class="hidden">
+      <div class="page-header animate-in">
+        <h1 class="page-title">Messages</h1>
+        <p class="page-subtitle">Direct communication with your team.</p>
+      </div>
+      <div class="content-area">
+        <div class="grid-2" style="gap:20px;align-items:flex-start;">
+          <div>
+            <div class="section-header"><h3 class="section-title">Conversations</h3></div>
+            <div class="message-list" id="conversations-list">
+              <div class="loading-center"><div class="spinner"></div></div>
+            </div>
+          </div>
+          <div id="chat-panel" class="card" style="display:none;">
+            <div id="chat-header" style="margin-bottom:12px;font-family:var(--font-display);font-size:1.1rem;"></div>
+            <div class="chat-area" id="chat-area"></div>
+            <div class="chat-input-area">
+              <input type="text" class="form-input" id="chat-input" placeholder="Type a message..." onkeydown="if(event.key==='Enter') sendMessage()" />
+              <button class="btn btn-primary" onclick="sendMessage()">Send</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── NOTIFICATIONS ── -->
+    <div id="section-notifications" class="hidden">
+      <div class="page-header animate-in">
+        <h1 class="page-title">Notifications</h1>
+        <p class="page-subtitle">Stay up to date.</p>
+      </div>
+      <div class="content-area">
+        <div class="section-header">
+          <h3 class="section-title">All Notifications</h3>
+          <button class="btn btn-ghost btn-sm" onclick="markAllRead()">Mark all read</button>
+        </div>
+        <div class="notif-list" id="notif-list">
+          <div class="loading-center"><div class="spinner"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SETTINGS ── -->
+    <div id="section-settings" class="hidden">
+      <div class="page-header animate-in">
+        <h1 class="page-title">Settings</h1>
+        <p class="page-subtitle">Manage your account preferences.</p>
+      </div>
+      <div class="content-area">
+        <div class="card" style="max-width:480px;">
+          <h3 style="font-family:var(--font-display);margin-bottom:20px;">Profile</h3>
+          <div style="display:flex;flex-direction:column;gap:16px;">
+            <div class="form-group">
+              <label class="form-label">Full Name</label>
+              <input type="text" class="form-input" id="settings-name" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input type="email" class="form-input" id="settings-email" disabled />
+            </div>
+            <div class="divider"></div>
+            <div class="flex items-center justify-between">
+              <div>
+                <div style="font-size:14px;font-weight:500;">Dark Mode</div>
+                <div class="text-sm text-muted">Toggle site appearance</div>
+              </div>
+              <button class="btn btn-ghost theme-toggle" onclick="toggleTheme(currentUser?.id)">
+                <span class="theme-icon">☀️</span>
+              </button>
+            </div>
+            <button class="btn btn-primary" onclick="saveProfile()">Save Changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ── MODALS ── -->
+
+<!-- Create Group Modal -->
+<div class="modal-backdrop" id="modal-create-group">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 class="modal-title">Create Group</h3>
+      <button class="modal-close" onclick="closeModal('modal-create-group')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Group Name</label>
+        <input type="text" class="form-input" id="new-group-name" placeholder="e.g. Food Drive Team" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Description</label>
+        <textarea class="form-textarea" id="new-group-desc" placeholder="What is this group about?"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Assign Coordinator</label>
+        <select class="form-select" id="new-group-coordinator">
+          <option value="">— Select Coordinator —</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-create-group')">Cancel</button>
+      <button class="btn btn-primary" onclick="createGroup()">Create Group</button>
+    </div>
+  </div>
+</div>
+
+<!-- Assign Volunteers to Group Modal -->
+<div class="modal-backdrop" id="modal-assign-volunteers">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 class="modal-title">Assign Volunteers</h3>
+      <button class="modal-close" onclick="closeModal('modal-assign-volunteers')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p class="text-sm text-muted" style="margin-bottom:8px;">Select volunteers to add to this group. Volunteers can belong to multiple groups.</p>
+      <div id="assign-volunteers-list" style="display:flex;flex-direction:column;gap:8px;max-height:300px;overflow-y:auto;"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-assign-volunteers')">Cancel</button>
+      <button class="btn btn-primary" onclick="assignVolunteersToGroup()">Assign Selected</button>
+    </div>
+  </div>
+</div>
+
+<!-- Create Task Modal -->
+<div class="modal-backdrop" id="modal-create-task">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 class="modal-title">Create Task</h3>
+      <button class="modal-close" onclick="closeModal('modal-create-task')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Task Title</label>
+        <input type="text" class="form-input" id="new-task-title" placeholder="e.g. Prepare welcome packs" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Description</label>
+        <textarea class="form-textarea" id="new-task-desc" placeholder="Task details..."></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Assign To</label>
+        <select class="form-select" id="new-task-assignee">
+          <option value="">— Select Person —</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Due Date</label>
+        <input type="date" class="form-input" id="new-task-due" />
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-create-task')">Cancel</button>
+      <button class="btn btn-primary" onclick="createTask()">Create Task</button>
+    </div>
+  </div>
+</div>
+
+<!-- Role Change Modal -->
+<div class="modal-backdrop" id="modal-role-change">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 class="modal-title" id="role-modal-title">Change Role</h3>
+      <button class="modal-close" onclick="closeModal('modal-role-change')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="role-change-info" id="role-change-info"></div>
+      <p class="text-sm text-muted">This will immediately change the user's dashboard access.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-role-change')">Cancel</button>
+      <button class="btn btn-primary" id="role-confirm-btn" onclick="confirmRoleChange()">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toast-container"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.emailjs.com/dist/email.min.js"></script>
+<script src="js/config.js"></script>
+<script src="js/theme.js"></script>
+<script src="js/emailjs.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>

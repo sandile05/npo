@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VolunteerHub — Coordinator</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/coordinator.css" />
+</head>
+<body>
+<div class="bg-atmosphere"></div>
+<div class="coordinator-layout">
+
+  <button class="nav-mobile-trigger" onclick="toggleNav()">☰</button>
+  <div class="nav-overlay" id="nav-overlay" onclick="toggleNav()"></div>
+
+  <nav class="nav-sidebar" id="nav-sidebar">
+    <div class="nav-logo">
+      <div class="nav-logo-text">VolunteerHub</div>
+      <div class="nav-logo-sub">Coordinator</div>
+    </div>
+    <div class="nav-user">
+      <div class="nav-avatar" id="nav-avatar">C</div>
+      <div class="nav-user-info">
+        <div class="nav-user-name" id="nav-name">Loading...</div>
+        <div class="nav-user-role">Coordinator</div>
+      </div>
+    </div>
+    <div class="nav-links">
+      <button class="nav-link active" onclick="showSection('overview')"><span class="nav-link-icon">📊</span> Overview</button>
+      <button class="nav-link" onclick="showSection('groups')"><span class="nav-link-icon">🗂️</span> My Groups</button>
+      <button class="nav-link" onclick="showSection('volunteers')"><span class="nav-link-icon">👥</span> My Volunteers</button>
+      <button class="nav-link" onclick="showSection('tasks')"><span class="nav-link-icon">✅</span> Tasks</button>
+      <button class="nav-link" onclick="showSection('messages')"><span class="nav-link-icon">💬</span> Messages <span class="nav-badge hidden" id="msg-badge">0</span></button>
+      <button class="nav-link" onclick="showSection('notifications')"><span class="nav-link-icon">🔔</span> Notifications <span class="nav-badge hidden" id="notif-badge">0</span></button>
+    </div>
+    <div class="nav-bottom">
+      <button class="nav-link" onclick="showSection('settings')"><span class="nav-link-icon">⚙️</span> Settings</button>
+      <button class="nav-link" onclick="handleSignOut()"><span class="nav-link-icon">🚪</span> Sign Out</button>
+    </div>
+  </nav>
+
+  <main class="main-content">
+
+    <!-- OVERVIEW -->
+    <div id="section-overview">
+      <div class="page-header animate-in">
+        <h1 class="page-title">Overview</h1>
+        <p class="page-subtitle" id="coord-greeting">Welcome back.</p>
+      </div>
+      <div class="content-area">
+        <div class="stats-grid animate-in delay-1">
+          <div class="stat-card"><div class="stat-label">My Volunteers</div><div class="stat-value" id="stat-volunteers">—</div></div>
+          <div class="stat-card"><div class="stat-label">My Groups</div><div class="stat-value" id="stat-groups">—</div></div>
+          <div class="stat-card"><div class="stat-label">Open Tasks</div><div class="stat-value" id="stat-tasks">—</div></div>
+          <div class="stat-card"><div class="stat-label">Completed</div><div class="stat-value" id="stat-completed">—</div></div>
+        </div>
+        <div class="section animate-in delay-2">
+          <div class="section-header"><h3 class="section-title">Recent Activity</h3></div>
+          <div class="notif-list" id="recent-activity"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MY GROUPS -->
+    <div id="section-groups" class="hidden">
+      <div class="page-header animate-in">
+        <h1 class="page-title">My Groups</h1>
+        <p class="page-subtitle">Groups assigned to you.</p>
+      </div>
+      <div class="content-area" id="groups-content">
+        <div class="loading-center"><div class="spinner"></div></div>
+      </div>
+    </div>
+
+    <!-- MY VOLUNTEERS -->
+    <div id="section-volunteers" class="hidden">
+      <div class="page-header animate-in">
+        <h1 class="page-title">My Volunteers</h1>
+        <p class="page-subtitle">Volunteers across your groups.</p>
+      </div>
+      <div class="content-area">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Volunteer</th><th>Email</th><th>Groups</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="my-volunteers-body"><tr><td colspan="5"><div class="loading-center"><div class="spinner"></div></div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TASKS -->
+    <div id="section-tasks" class="hidden">
+      <div class="page-header animate-in">
+        <h1 class="page-title">Tasks</h1>
+        <p class="page-subtitle">Assign and track your group's tasks.</p>
+      </div>
+      <div class="content-area">
+        <div class="section-header">
+          <h3 class="section-title">Tasks</h3>
+          <button class="btn btn-primary btn-sm" onclick="openCreateTaskModal()">+ New Task</button>
+        </div>
+        <div class="task-list" id="coord-tasks-list"><div class="loading-center"><div class="spinner"></div></div></div>
+      </div>
+    </div>
+
+    <!-- MESSAGES -->
+    <div id="section-messages" class="hidden">
+      <div class="page-header animate-in">
+        <h1 class="page-title">Messages</h1>
+      </div>
+      <div class="content-area">
+        <div class="grid-2" style="gap:20px;align-items:flex-start;">
+          <div>
+            <div class="section-header"><h3 class="section-title">Conversations</h3></div>
+            <div class="message-list" id="coord-conversations"></div>
+          </div>
+          <div id="coord-chat-panel" class="card" style="display:none;">
+            <div id="coord-chat-header" style="margin-bottom:12px;font-family:var(--font-display);font-size:1.1rem;"></div>
+            <div class="chat-area" id="coord-chat-area"></div>
+            <div class="chat-input-area">
+              <input type="text" class="form-input" id="coord-chat-input" placeholder="Type a message..." onkeydown="if(event.key==='Enter') sendCoordMessage()" />
+              <button class="btn btn-primary" onclick="sendCoordMessage()">Send</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NOTIFICATIONS -->
+    <div id="section-notifications" class="hidden">
+      <div class="page-header animate-in"><h1 class="page-title">Notifications</h1></div>
+      <div class="content-area">
+        <div class="section-header">
+          <h3 class="section-title">All Notifications</h3>
+          <button class="btn btn-ghost btn-sm" onclick="markAllNotifRead()">Mark all read</button>
+        </div>
+        <div class="notif-list" id="coord-notif-list"><div class="loading-center"><div class="spinner"></div></div></div>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div id="section-settings" class="hidden">
+      <div class="page-header animate-in"><h1 class="page-title">Settings</h1></div>
+      <div class="content-area">
+        <div class="card" style="max-width:480px;">
+          <h3 style="font-family:var(--font-display);margin-bottom:20px;">Profile</h3>
+          <div style="display:flex;flex-direction:column;gap:16px;">
+            <div class="form-group"><label class="form-label">Full Name</label><input type="text" class="form-input" id="coord-settings-name" /></div>
+            <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" id="coord-settings-email" disabled /></div>
+            <div class="divider"></div>
+            <div class="flex items-center justify-between">
+              <div><div style="font-size:14px;font-weight:500;">Dark Mode</div><div class="text-sm text-muted">Toggle appearance</div></div>
+              <button class="btn btn-ghost theme-toggle" onclick="toggleTheme(currentUser?.id)"><span class="theme-icon">☀️</span></button>
+            </div>
+            <button class="btn btn-primary" onclick="saveCoordProfile()">Save Changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Create Task Modal -->
+<div class="modal-backdrop" id="modal-coord-task">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 class="modal-title">Assign Task</h3>
+      <button class="modal-close" onclick="closeModal('modal-coord-task')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Task Title</label><input type="text" class="form-input" id="coord-task-title" placeholder="Task name" /></div>
+      <div class="form-group"><label class="form-label">Description</label><textarea class="form-textarea" id="coord-task-desc" placeholder="Details..."></textarea></div>
+      <div class="form-group"><label class="form-label">Assign To</label><select class="form-select" id="coord-task-assignee"><option value="">— Select Volunteer —</option></select></div>
+      <div class="form-group"><label class="form-label">Due Date</label><input type="date" class="form-input" id="coord-task-due" /></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-coord-task')">Cancel</button>
+      <button class="btn btn-primary" onclick="createCoordTask()">Assign Task</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toast-container"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.emailjs.com/dist/email.min.js"></script>
+<script src="js/config.js"></script>
+<script src="js/theme.js"></script>
+<script src="js/emailjs.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/coordinator.js"></script>
+</body>
+</html>

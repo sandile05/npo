@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VolunteerHub — Volunteer</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/volunteer.css" />
+</head>
+<body>
+<div class="bg-atmosphere"></div>
+<div class="volunteer-layout">
+
+  <button class="nav-mobile-trigger" onclick="toggleNav()">☰</button>
+  <div class="nav-overlay" id="nav-overlay" onclick="toggleNav()"></div>
+
+  <nav class="nav-sidebar" id="nav-sidebar">
+    <div class="nav-logo">
+      <div class="nav-logo-text">VolunteerHub</div>
+      <div class="nav-logo-sub">Volunteer Portal</div>
+    </div>
+    <div class="nav-user">
+      <div class="nav-avatar" id="nav-avatar">V</div>
+      <div class="nav-user-info">
+        <div class="nav-user-name" id="nav-name">Loading...</div>
+        <div class="nav-user-role">Volunteer</div>
+      </div>
+    </div>
+    <div class="nav-links">
+      <button class="nav-link active" onclick="showSection('dashboard')"><span class="nav-link-icon">🏠</span> Dashboard</button>
+      <button class="nav-link" onclick="showSection('groups')"><span class="nav-link-icon">🗂️</span> My Groups</button>
+      <button class="nav-link" onclick="showSection('tasks')"><span class="nav-link-icon">✅</span> My Tasks</button>
+      <button class="nav-link" onclick="showSection('messages')"><span class="nav-link-icon">💬</span> Messages <span class="nav-badge hidden" id="msg-badge">0</span></button>
+      <button class="nav-link" onclick="showSection('notifications')"><span class="nav-link-icon">🔔</span> Notifications <span class="nav-badge hidden" id="notif-badge">0</span></button>
+    </div>
+    <div class="nav-bottom">
+      <button class="nav-link" onclick="showSection('profile')"><span class="nav-link-icon">👤</span> Profile</button>
+      <button class="nav-link" onclick="handleSignOut()"><span class="nav-link-icon">🚪</span> Sign Out</button>
+    </div>
+  </nav>
+
+  <main class="main-content">
+
+    <!-- DASHBOARD -->
+    <div id="section-dashboard">
+      <div class="page-header animate-in">
+        <h1 class="page-title" id="vol-greeting">Welcome</h1>
+        <p class="page-subtitle">Your volunteer portal.</p>
+      </div>
+      <div class="content-area">
+        <!-- Application Status Banner -->
+        <div class="status-banner pending animate-in" id="status-banner">
+          <div class="status-icon" id="status-icon">⏳</div>
+          <div class="status-text">
+            <h3 id="status-title">Application Pending</h3>
+            <p id="status-desc">Your application is currently under review. We'll notify you once a decision has been made.</p>
+          </div>
+        </div>
+        <!-- Quick stats -->
+        <div class="stats-grid animate-in delay-1">
+          <div class="stat-card"><div class="stat-label">My Groups</div><div class="stat-value" id="vol-stat-groups">—</div></div>
+          <div class="stat-card"><div class="stat-label">My Tasks</div><div class="stat-value" id="vol-stat-tasks">—</div></div>
+          <div class="stat-card"><div class="stat-label">Completed</div><div class="stat-value" id="vol-stat-done">—</div></div>
+          <div class="stat-card"><div class="stat-label">Notifications</div><div class="stat-value" id="vol-stat-notifs">—</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MY GROUPS -->
+    <div id="section-groups" class="hidden">
+      <div class="page-header animate-in">
+        <h1 class="page-title">My Groups</h1>
+        <p class="page-subtitle">Your teams and fellow members.</p>
+      </div>
+      <div class="content-area">
+        <div id="vol-groups-content" style="display:flex;flex-direction:column;gap:16px;">
+          <div class="loading-center"><div class="spinner"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MY TASKS -->
+    <div id="section-tasks" class="hidden">
+      <div class="page-header animate-in">
+        <h1 class="page-title">My Tasks</h1>
+        <p class="page-subtitle">Tasks assigned to you.</p>
+      </div>
+      <div class="content-area">
+        <div class="tabs">
+          <button class="tab active" onclick="filterTasks('all', this)">All</button>
+          <button class="tab" onclick="filterTasks('pending', this)">Pending</button>
+          <button class="tab" onclick="filterTasks('in-progress', this)">In Progress</button>
+          <button class="tab" onclick="filterTasks('completed', this)">Completed</button>
+        </div>
+        <div class="tasks-grid" id="vol-tasks-grid">
+          <div class="loading-center"><div class="spinner"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MESSAGES -->
+    <div id="section-messages" class="hidden">
+      <div class="page-header animate-in"><h1 class="page-title">Messages</h1></div>
+      <div class="content-area">
+        <div class="grid-2" style="gap:20px;align-items:flex-start;">
+          <div>
+            <div class="section-header"><h3 class="section-title">Conversations</h3></div>
+            <div class="message-list" id="vol-conversations"></div>
+          </div>
+          <div id="vol-chat-panel" class="card" style="display:none;">
+            <div id="vol-chat-header" style="margin-bottom:12px;font-family:var(--font-display);font-size:1.1rem;"></div>
+            <div class="chat-area" id="vol-chat-area"></div>
+            <div class="chat-input-area">
+              <input type="text" class="form-input" id="vol-chat-input" placeholder="Type a message..." onkeydown="if(event.key==='Enter') sendVolMessage()" />
+              <button class="btn btn-primary" onclick="sendVolMessage()">Send</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NOTIFICATIONS -->
+    <div id="section-notifications" class="hidden">
+      <div class="page-header animate-in"><h1 class="page-title">Notifications</h1></div>
+      <div class="content-area">
+        <div class="section-header">
+          <h3 class="section-title">All Notifications</h3>
+          <button class="btn btn-ghost btn-sm" onclick="markAllRead()">Mark all read</button>
+        </div>
+        <div class="notif-list" id="vol-notif-list"></div>
+      </div>
+    </div>
+
+    <!-- PROFILE -->
+    <div id="section-profile" class="hidden">
+      <div class="page-header animate-in"><h1 class="page-title">Profile</h1></div>
+      <div class="content-area">
+        <div class="profile-section animate-in">
+          <div class="profile-avatar-area">
+            <div class="profile-avatar-lg" id="profile-avatar-lg">V</div>
+            <div>
+              <div style="font-family:var(--font-display);font-size:1.3rem;" id="profile-display-name">—</div>
+              <div class="text-sm text-muted" id="profile-display-email">—</div>
+              <span class="badge badge-volunteer" style="margin-top:6px;">Volunteer</span>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:16px;">
+            <div class="form-group"><label class="form-label">Full Name</label><input type="text" class="form-input" id="vol-profile-name" /></div>
+            <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" id="vol-profile-email" disabled /></div>
+            <div class="form-group"><label class="form-label">New Password</label><input type="password" class="form-input" id="vol-profile-password" placeholder="Leave blank to keep current" /></div>
+            <div class="divider"></div>
+            <div class="flex items-center justify-between">
+              <div><div style="font-size:14px;font-weight:500;">Dark Mode</div><div class="text-sm text-muted">Toggle appearance</div></div>
+              <button class="btn btn-ghost theme-toggle" onclick="toggleTheme(currentUser?.id)"><span class="theme-icon">☀️</span></button>
+            </div>
+            <button class="btn btn-primary" onclick="saveVolProfile()">Save Changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div class="toast-container" id="toast-container"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.emailjs.com/dist/email.min.js"></script>
+<script src="js/config.js"></script>
+<script src="js/theme.js"></script>
+<script src="js/emailjs.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/volunteer.js"></script>
+</body>
+</html>
