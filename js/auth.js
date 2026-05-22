@@ -20,6 +20,8 @@ async function getCurrentUser() {
     .select('*')
     .eq('id', session.user.id)
     .single();
+  console.log('USER DATA:', data);
+  console.log('USER ERROR:', error);
   if (error) return null;
   return data;
 }
